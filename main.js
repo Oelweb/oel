@@ -19,6 +19,8 @@ const servers = [
     { ip: "play.minehut.com", category: "MiniGames" },
     { ip: "play.loverfella.com", category: "Survival" },
     { ip: "play.pika-network.net", category: "PvP" }
+    { ip: "Opsucht.net", category: "Citybuild" },
+    { ip: "BlockBande.de", category: "Citybuild" },
 ];
 
 async function fetchServerStatus(ip) {
