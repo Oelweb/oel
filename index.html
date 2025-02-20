@@ -24,54 +24,70 @@
         <p id="copy-message" class="text-green-400 mt-2 hidden">IP-Adresse erfolgreich kopiert!</p>
 
         <h2 class="text-2xl font-bold mt-8">Beliebte Server</h2>
-        <div id="popular-servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"></div>
+        
+        <input id="category-search" type="text" placeholder="Kategorie (PvP, Citybuild, etc.)" class="p-2 rounded bg-gray-800 text-white w-80 mt-4 mb-4" onkeyup="filterServers()">
+        
+        <div id="popular-servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 px-4"></div>
     </div>
 
     <script>
-        async function fetchServerStatus(serverIP) {
-            if (!serverIP) return;
-            try {
-                const response = await axios.get(`https://api.mcsrvstat.us/2/${serverIP}`);
-                const data = response.data;
-                if (!data.ip) {
-                    document.getElementById("error-message").classList.remove("hidden");
-                    return;
-                }
-                document.getElementById("server-info").classList.remove("hidden");
-                document.getElementById("server-ip").textContent = serverIP;
-                document.getElementById("server-status").textContent = data.online ? "Online" : "Offline";
-                document.getElementById("server-status").classList.add(data.online ? "text-green-400" : "text-red-400");
-                document.getElementById("player-count").textContent = data.players.online;
-                document.getElementById("error-message").classList.add("hidden");
-            } catch (error) {
-                document.getElementById("error-message").classList.remove("hidden");
-            }
-        }
+        const servers = [
+            { ip: "hypixel.net", category: "PvP" },
+            { ip: "mineplex.com", category: "PvP" },
+            { ip: "play.cubecraft.net", category: "MiniGames" },
+            { ip: "mc.hypixel.net", category: "MiniGames" },
+            { ip: "mc-central.net", category: "Citybuild" },
+            { ip: "herobrine.org", category: "Survival" },
+            { ip: "blocksmc.com", category: "PvP" },
+            { ip: "extremecraft.net", category: "Citybuild" },
+            { ip: "hivebedrock.network", category: "MiniGames" },
+            { ip: "cosmicpvp.com", category: "PvP" },
+            { ip: "purpleprison.org", category: "Prison" },
+            { ip: "wynncraft.com", category: "RPG" },
+            { ip: "minemen.club", category: "PvP" },
+            { ip: "pvplegacy.net", category: "PvP" },
+            { ip: "becto.net", category: "Survival" },
+            { ip: "play.jartexnetwork.com", category: "MiniGames" },
+            { ip: "play.manacube.net", category: "Citybuild" },
+            { ip: "play.minehut.com", category: "MiniGames" },
+            { ip: "play.loverfella.com", category: "Survival" },
+            { ip: "play.pika-network.net", category: "PvP" }
+        ];
 
         async function fetchPopularServers() {
-            const servers = [
-                "hypixel.net", "mineplex.com", "play.cubecraft.net", "mc.hypixel.net", "mc-central.net", "herobrine.org", 
-                "blocksmc.com", "extremecraft.net", "hivebedrock.network", "cosmicpvp.com", "purpleprison.org", "wynncraft.com", 
-                "minemen.club", "pvplegacy.net", "becto.net", "play.jartexnetwork.com", "play.manacube.net", "play.minehut.com", 
-                "play.loverfella.com", "play.pika-network.net"
-            ];
             const container = document.getElementById("popular-servers");
             container.innerHTML = "";
             
             for (const server of servers) {
                 try {
-                    const response = await axios.get(`https://api.mcsrvstat.us/2/${server}`);
+                    const response = await axios.get(`https://api.mcsrvstat.us/2/${server.ip}`);
                     const data = response.data;
                     const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center'>
-                        <p class='font-bold'>${server}</p>
+                        <p class='font-bold'>${server.ip} (${server.category})</p>
                         <p>Status: <span class='${data.online ? "text-green-400" : "text-red-400"}'>${data.online ? "Online" : "Offline"}</span></p>
                         <p>Spieler online: ${data.players.online}</p>
-                        <button onclick='copyToClipboard("${server}")' class='bg-blue-500 px-2 py-1 mt-2 rounded'>IP kopieren</button>
+                        <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded'>IP kopieren</button>
                     </div>`;
                     container.innerHTML += serverCard;
                 } catch (error) {
-                    console.error(`Fehler beim Abrufen von ${server}`);
+                    console.error(`Fehler beim Abrufen von ${server.ip}`);
                 }
+            }
+        }
+
+        function filterServers() {
+            const searchValue = document.getElementById("category-search").value.toLowerCase();
+            const container = document.getElementById("popular-servers");
+            container.innerHTML = "";
+            
+            const filteredServers = servers.filter(server => server.category.toLowerCase().includes(searchValue));
+            
+            for (const server of filteredServers) {
+                const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center'>
+                    <p class='font-bold'>${server.ip} (${server.category})</p>
+                    <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded'>IP kopieren</button>
+                </div>`;
+                container.innerHTML += serverCard;
             }
         }
 
