@@ -1,48 +1,3 @@
-const translations = {
-    de: {
-        title: "Minecraft Server Status",
-        searchPlaceholder: "Server suchen...",
-        searchButton: "Suchen",
-        server: "Server",
-        status: "Status",
-        onlinePlayers: "Spieler online",
-        checking: "Prüfen...",
-        errorMessage: "Server konnte nicht gefunden werden.",
-        copyMessage: "IP-Adresse erfolgreich kopiert!",
-        popularServers: "Beliebte Server",
-        categorySelect: "Kategorie wählen...",
-        categories: {
-            PvP: "PvP",
-            Citybuild: "Citybuild",
-            MiniGames: "MiniGames",
-            Survival: "Survival",
-            Prison: "Prison",
-            RPG: "RPG"
-        }
-    },
-    en: {
-        title: "Minecraft Server Status",
-        searchPlaceholder: "Search Server...",
-        searchButton: "Search",
-        server: "Server",
-        status: "Status",
-        onlinePlayers: "Players Online",
-        checking: "Checking...",
-        errorMessage: "Server could not be found.",
-        copyMessage: "IP Address copied successfully!",
-        popularServers: "Popular Servers",
-        categorySelect: "Select Category...",
-        categories: {
-            PvP: "PvP",
-            Citybuild: "Citybuild",
-            MiniGames: "MiniGames",
-            Survival: "Survival",
-            Prison: "Prison",
-            RPG: "RPG"
-        }
-    }
-};
-
 const servers = [
     { ip: "hypixel.net", category: "PvP" },
     { ip: "mineplex.com", category: "PvP" },
@@ -131,38 +86,5 @@ function copyToClipboard(text) {
     });
 }
 
-function changeLanguage(lang) {
-    const translation = translations[lang];
-
-    // Update text content for language change
-    document.title = translation.title;
-    document.querySelector('h1').textContent = translation.title;
-    document.getElementById('server-search').placeholder = translation.searchPlaceholder;
-    document.querySelector('button[onclick="fetchServerStatus(document.getElementById(\'server-search\').value)"]').textContent = translation.searchButton;
-    document.querySelector('h2').textContent = translation.popularServers;
-
-    const categorySelect = document.getElementById('category-search');
-    categorySelect.querySelector('option').textContent = translation.categorySelect;
-    const options = categorySelect.querySelectorAll('option');
-    options[1].textContent = translation.categories.PvP;
-    options[2].textContent = translation.categories.Citybuild;
-    options[3].textContent = translation.categories.MiniGames;
-    options[4].textContent = translation.categories.Survival;
-    options[5].textContent = translation.categories.Prison;
-    options[6].textContent = translation.categories.RPG;
-
-    // Update other static texts as needed
-    document.getElementById('error-message').textContent = translation.errorMessage;
-    document.getElementById('copy-message').textContent = translation.copyMessage;
-}
-
-// Event listeners for language buttons
-document.querySelector("button[onclick='changeLanguage(\'de\')']").addEventListener("click", () => changeLanguage("de"));
-document.querySelector("button[onclick='changeLanguage(\'en\')']").addEventListener("click", () => changeLanguage("en"));
-
-// Initial language setup (default to German)
-changeLanguage("de");
-
-// Fetch popular servers initially
+// Initial server fetch
 fetchPopularServers();
-
