@@ -12,7 +12,7 @@
         <h1 class="text-3xl font-bold mb-6">Minecraft Server Status</h1>
         
         <input id="server-search" type="text" placeholder="Server suchen..." class="p-2 rounded bg-gray-800 text-white w-80 mb-4">
-        <button onclick="fetchServerStatus(document.getElementById('server-search').value)" class="bg-blue-500 px-4 py-2 rounded">Suchen</button>
+        <button onclick="fetchServerStatus(document.getElementById('server-search').value)" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Suchen</button>
 
         <div id="server-info" class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center mt-4 hidden">
             <p class="text-lg">Server: <span id="server-ip" class="font-semibold"></span></p>
@@ -25,7 +25,15 @@
 
         <h2 class="text-2xl font-bold mt-8">Beliebte Server</h2>
         
-        <input id="category-search" type="text" placeholder="Kategorie (PvP, Citybuild, etc.)" class="p-2 rounded bg-gray-800 text-white w-80 mt-4 mb-4" onkeyup="filterServers()">
+        <select id="category-search" class="p-2 rounded bg-gray-800 text-white w-80 mt-4 mb-4" onchange="filterServers()">
+            <option value="">Kategorie wählen...</option>
+            <option value="PvP">PvP</option>
+            <option value="Citybuild">Citybuild</option>
+            <option value="MiniGames">MiniGames</option>
+            <option value="Survival">Survival</option>
+            <option value="Prison">Prison</option>
+            <option value="RPG">RPG</option>
+        </select>
         
         <div id="popular-servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 px-4"></div>
     </div>
@@ -62,15 +70,19 @@
                 try {
                     const response = await axios.get(`https://api.mcsrvstat.us/2/${server.ip}`);
                     const data = response.data;
-                    const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center'>
+                    const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
                         <p class='font-bold'>${server.ip} (${server.category})</p>
                         <p>Status: <span class='${data.online ? "text-green-400" : "text-red-400"}'>${data.online ? "Online" : "Offline"}</span></p>
                         <p>Spieler online: ${data.players.online}</p>
-                        <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded'>IP kopieren</button>
+                        <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
                     </div>`;
                     container.innerHTML += serverCard;
                 } catch (error) {
                     console.error(`Fehler beim Abrufen von ${server.ip}`);
+                    document.getElementById("error-message").classList.remove("hidden");
+                    setTimeout(() => {
+                        document.getElementById("error-message").classList.add("hidden");
+                    }, 2000);
                 }
             }
         }
@@ -83,9 +95,9 @@
             const filteredServers = servers.filter(server => server.category.toLowerCase().includes(searchValue));
             
             for (const server of filteredServers) {
-                const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center'>
+                const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
                     <p class='font-bold'>${server.ip} (${server.category})</p>
-                    <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded'>IP kopieren</button>
+                    <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
                 </div>`;
                 container.innerHTML += serverCard;
             }
