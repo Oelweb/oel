@@ -1,46 +1,47 @@
-async function fetchServerStatus() {
-    const serverIp = document.getElementById('server-search').value;
-    const serverInfo = document.getElementById("server-info");
-    const errorMessage = document.getElementById("error-message");
-    const serverIPElement = document.getElementById("server-ip");
-    const serverStatusElement = document.getElementById("server-status");
-    const playerCountElement = document.getElementById("player-count");
-
-    // Clear previous state
-    serverInfo.classList.add("hidden");
-    errorMessage.classList.add("hidden");
-
-    if (!serverIp) {
-        return; // Exit if no server IP is provided
-    }
-
-    serverStatusElement.textContent = "Prüfen...";
-
-    try {
-        const response = await axios.get(`https://api.mcsrvstat.us/2/${serverIp}`);
-        const data = response.data;
-
-        // Check if the server is online
-        if (data.online) {
-            serverIPElement.textContent = serverIp;
-            serverStatusElement.textContent = "Online";
-            serverStatusElement.classList.remove("text-yellow-400");
-            serverStatusElement.classList.add("text-green-400");
-            playerCountElement.textContent = data.players.online;
-            serverInfo.classList.remove("hidden");
-            errorMessage.classList.add("hidden");
-        } else {
-            throw new Error("Server ist offline");
+const translations = {
+    de: {
+        title: "Minecraft Server Status",
+        searchPlaceholder: "Server suchen...",
+        searchButton: "Suchen",
+        server: "Server",
+        status: "Status",
+        onlinePlayers: "Spieler online",
+        checking: "Prüfen...",
+        errorMessage: "Server konnte nicht gefunden werden.",
+        copyMessage: "IP-Adresse erfolgreich kopiert!",
+        popularServers: "Beliebte Server",
+        categorySelect: "Kategorie wählen...",
+        categories: {
+            PvP: "PvP",
+            Citybuild: "Citybuild",
+            MiniGames: "MiniGames",
+            Survival: "Survival",
+            Prison: "Prison",
+            RPG: "RPG"
         }
-    } catch (error) {
-        serverStatusElement.textContent = "Offline";
-        serverStatusElement.classList.remove("text-yellow-400");
-        serverStatusElement.classList.add("text-red-400");
-        playerCountElement.textContent = "Nicht verfügbar";
-        serverInfo.classList.add("hidden");
-        errorMessage.classList.remove("hidden");
+    },
+    en: {
+        title: "Minecraft Server Status",
+        searchPlaceholder: "Search Server...",
+        searchButton: "Search",
+        server: "Server",
+        status: "Status",
+        onlinePlayers: "Players Online",
+        checking: "Checking...",
+        errorMessage: "Server could not be found.",
+        copyMessage: "IP Address copied successfully!",
+        popularServers: "Popular Servers",
+        categorySelect: "Select Category...",
+        categories: {
+            PvP: "PvP",
+            Citybuild: "Citybuild",
+            MiniGames: "MiniGames",
+            Survival: "Survival",
+            Prison: "Prison",
+            RPG: "RPG"
+        }
     }
-}
+};
 
 const servers = [
     { ip: "hypixel.net", category: "PvP" },
@@ -65,31 +66,41 @@ const servers = [
     { ip: "play.pika-network.net", category: "PvP" }
 ];
 
-async function fetchPopularServers() {
+async function fetchServerStatus(ip) {
+    const serverInfoDiv = document.getElementById('server-info');
+    const serverIp = document.getElementById('server-ip');
+    const serverStatus = document.getElementById('server-status');
+    const playerCount = document.getElementById('player-count');
+    const errorMessage = document.getElementById('error-message');
+    const serverSearchInput = document.getElementById('server-search');
+    
+    try {
+        const response = await axios.get(`https://api.mcsrvstat.us/2/${ip}`);
+        const data = response.data;
+
+        serverIp.textContent = ip;
+        serverStatus.textContent = data.online ? 'Online' : 'Offline';
+        serverStatus.classList = data.online ? 'text-green-400' : 'text-red-400';
+        playerCount.textContent = data.players.online;
+
+        serverInfoDiv.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+    } catch (error) {
+        serverInfoDiv.classList.add('hidden');
+        errorMessage.classList.remove('hidden');
+    }
+}
+
+function fetchPopularServers() {
     const container = document.getElementById("popular-servers");
     container.innerHTML = "";
     
     for (const server of servers) {
-        try {
-            const response = await axios.get(`https://api.mcsrvstat.us/2/${server.ip}`);
-            const data = response.data;
-            const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
-                <p class='font-bold'>${server.ip} (${server.category})</p>
-                <p>Status: <span class='${data.online ? "text-green-400" : "text-red-400"}'>${data.online ? "Online" : "Offline"}</span></p>
-                <p>Spieler online: ${data.players.online}</p>
-                <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
-            </div>`;
-            container.innerHTML += serverCard;
-        } catch (error) {
-            console.error(`Fehler beim Abrufen von ${server.ip}`);
-            const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
-                <p class='font-bold'>${server.ip} (${server.category})</p>
-                <p>Status: <span class='text-red-400'>Offline</span></p>
-                <p>Spieler online: Nicht verfügbar</p>
-                <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
-            </div>`;
-            container.innerHTML += serverCard;
-        }
+        const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
+            <p class='font-bold'>${server.ip} (${server.category})</p>
+            <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
+        </div>`;
+        container.innerHTML += serverCard;
     }
 }
 
@@ -116,8 +127,42 @@ function copyToClipboard(text) {
             document.getElementById("copy-message").classList.add("hidden");
         }, 2000);
     }).catch(err => {
-        console.error("Fehler beim Kopieren: ", err); 
+        console.error("Fehler beim Kopieren: ", err);            
     });
 }
 
-fetchPopularServers();  // Fetch popular servers when the page loads
+function changeLanguage(lang) {
+    const translation = translations[lang];
+
+    // Update text content for language change
+    document.title = translation.title;
+    document.querySelector('h1').textContent = translation.title;
+    document.getElementById('server-search').placeholder = translation.searchPlaceholder;
+    document.querySelector('button[onclick="fetchServerStatus(document.getElementById(\'server-search\').value)"]').textContent = translation.searchButton;
+    document.querySelector('h2').textContent = translation.popularServers;
+
+    const categorySelect = document.getElementById('category-search');
+    categorySelect.querySelector('option').textContent = translation.categorySelect;
+    const options = categorySelect.querySelectorAll('option');
+    options[1].textContent = translation.categories.PvP;
+    options[2].textContent = translation.categories.Citybuild;
+    options[3].textContent = translation.categories.MiniGames;
+    options[4].textContent = translation.categories.Survival;
+    options[5].textContent = translation.categories.Prison;
+    options[6].textContent = translation.categories.RPG;
+
+    // Update other static texts as needed
+    document.getElementById('error-message').textContent = translation.errorMessage;
+    document.getElementById('copy-message').textContent = translation.copyMessage;
+}
+
+// Event listeners for language buttons
+document.querySelector("button[onclick='changeLanguage(\'de\')']").addEventListener("click", () => changeLanguage("de"));
+document.querySelector("button[onclick='changeLanguage(\'en\')']").addEventListener("click", () => changeLanguage("en"));
+
+// Initial language setup (default to German)
+changeLanguage("de");
+
+// Fetch popular servers initially
+fetchPopularServers();
+
