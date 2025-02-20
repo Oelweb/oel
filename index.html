@@ -11,6 +11,11 @@
     <div class="flex flex-col items-center justify-center min-h-screen">
         <h1 class="text-3xl font-bold mb-6">Minecraft Server Status</h1>
         
+        <div class="flex space-x-4 mb-4">
+            <button onclick="changeLanguage('de')" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Deutsch</button>
+            <button onclick="changeLanguage('en')" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Englisch</button>
+        </div>
+
         <input id="server-search" type="text" placeholder="Server suchen..." class="p-2 rounded bg-gray-800 text-white w-80 mb-4">
         <button onclick="fetchServerStatus(document.getElementById('server-search').value)" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Suchen</button>
 
@@ -79,10 +84,13 @@
                     container.innerHTML += serverCard;
                 } catch (error) {
                     console.error(`Fehler beim Abrufen von ${server.ip}`);
-                    document.getElementById("error-message").classList.remove("hidden");
-                    setTimeout(() => {
-                        document.getElementById("error-message").classList.add("hidden");
-                    }, 2000);
+                    const serverCard = `<div class='bg-gray-800 p-4 rounded-lg text-center hover:bg-gray-700 transition duration-300'>
+                        <p class='font-bold'>${server.ip} (${server.category})</p>
+                        <p>Status: <span class='text-red-400'>Offline</span></p>
+                        <p>Spieler online: Nicht verfügbar</p>
+                        <button onclick='copyToClipboard("${server.ip}")' class='bg-blue-500 px-2 py-1 mt-2 rounded hover:bg-blue-600 transition duration-300'>IP kopieren</button>
+                    </div>`;
+                    container.innerHTML += serverCard;
                 }
             }
         }
@@ -114,8 +122,14 @@
             });
         }
 
+        function changeLanguage(lang) {
+            const elements = document.querySelectorAll('[lang]');
+            elements.forEach(el => el.lang = lang);
+        }
+
         fetchPopularServers();
     </script>
 </body>
 </html>
+
 
