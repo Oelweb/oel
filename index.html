@@ -6,37 +6,51 @@
     <title>Minecraft Server Status</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <style>
+        section, header, footer {
+            max-width: 1000px;
+            margin: 10px auto;
+            padding: 20px;
+            background: linear-gradient(45deg, #4c3a39, #3e3438); /* Dezent interessanter Hintergrund */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white">
     <div class="flex flex-col items-center justify-center min-h-screen">
-        <h1 class="text-3xl font-bold mb-6">Minecraft Server Status</h1>
+        <section><h1 class="text-3xl font-bold mb-6">Minecraft Server Status</h1></section>
         
+        <section>
+            <input id="server-search" type="text" placeholder="Server suchen..." class="p-2 rounded bg-gray-800 text-white w-80 mb-4">
+            <button onclick="fetchServerStatus()" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Suchen</button>
+    
+            <div id="server-info" class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center mt-4 hidden">
+                <p class="text-lg">Server: <span id="server-ip" class="font-semibold"></span></p>
+                <p class="text-lg mt-2">Status: <span id="server-status" class="text-yellow-400">Prüfen...</span></p>
+                <p class="text-lg mt-2">Spieler online: <span id="player-count" class="font-semibold">0</span></p>
+            </div>
+    
+            <p id="error-message" class="text-red-400 mt-4 hidden">Server konnte nicht gefunden werden.</p>
+            <p id="copy-message" class="text-green-400 mt-2 hidden">IP-Adresse erfolgreich kopiert!</p>
+        </section>
 
-        <input id="server-search" type="text" placeholder="Server suchen..." class="p-2 rounded bg-gray-800 text-white w-80 mb-4">
-        <button onclick="fetchServerStatus()" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Suchen</button>
 
-        <div id="server-info" class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center mt-4 hidden">
-            <p class="text-lg">Server: <span id="server-ip" class="font-semibold"></span></p>
-            <p class="text-lg mt-2">Status: <span id="server-status" class="text-yellow-400">Prüfen...</span></p>
-            <p class="text-lg mt-2">Spieler online: <span id="player-count" class="font-semibold">0</span></p>
-        </div>
-
-        <p id="error-message" class="text-red-400 mt-4 hidden">Server konnte nicht gefunden werden.</p>
-        <p id="copy-message" class="text-green-400 mt-2 hidden">IP-Adresse erfolgreich kopiert!</p>
-
-        <h2 class="text-2xl font-bold mt-8">Beliebte Server</h2>
+        <section>
+            <h2 class="text-2xl font-bold mt-8">Beliebte Server</h2>
+            
+            <select id="category-search" class="p-2 rounded bg-gray-800 text-white w-80 mt-4 mb-4" onchange="filterServers()">
+                <option value="">Kategorie wählen...</option>
+                <option value="PvP">PvP</option>
+                <option value="Citybuild">Citybuild</option>
+                <option value="MiniGames">MiniGames</option>
+                <option value="Survival">Survival</option>
+                <option value="Prison">Prison</option>
+                <option value="RPG">RPG</option>
+            </select>
+        </section>
+        <section><div id="popular-servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 px-4"></div></section>
         
-        <select id="category-search" class="p-2 rounded bg-gray-800 text-white w-80 mt-4 mb-4" onchange="filterServers()">
-            <option value="">Kategorie wählen...</option>
-            <option value="PvP">PvP</option>
-            <option value="Citybuild">Citybuild</option>
-            <option value="MiniGames">MiniGames</option>
-            <option value="Survival">Survival</option>
-            <option value="Prison">Prison</option>
-            <option value="RPG">RPG</option>
-        </select>
-        
-        <div id="popular-servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 px-4"></div>
     </div>
 
     <script>
